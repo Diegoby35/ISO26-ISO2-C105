@@ -1,76 +1,71 @@
 # DECISIONS.md
 
-## Contexto
+Registro de decisiones y supuestos del proyecto de Ingeniería del Software II. Este documento acompaña a la planificación y a los casos de uso; no sustituye la memoria teórica ni las decisiones que debe aprobar el equipo humano.
 
-Este proyecto se ha diseñado como una línea base para el sistema integral de gestión de radiodiagnóstico e imagen médica del Servicio de Salud de Castilla-La Mancha (SESCAM). La intención es cumplir la orientación del enunciado de la práctica: desarrollo dirigido por casos de uso, diseño centrado en la arquitectura y gestión incremental del producto.
+## Contexto y objetivo
 
-## Decisiones principales
+El sistema gestionará pruebas radiológicas e imagen médica del Servicio de Salud de Castilla-La Mancha (SESCAM): solicitudes, citación, realización e informes, además de agendas, recursos y seguimiento. Debe poder evolucionar hacia clientes web, de escritorio y móviles, e integrarse progresivamente con servicios hospitalarios.
 
-### 1. Estructura de dominio
+El proceso se guiará por el Proceso Unificado de Desarrollo (PUD): dirigido por casos de uso, iterativo e incremental, y centrado en una arquitectura explícita. El equipo humano conserva la responsabilidad de analizar requisitos, priorizar casos de uso, planificar, decidir la arquitectura y diseñar contratos y pruebas. La IA puede apoyar la implementación y ejecución de pruebas bajo revisión humana.
 
-Se ha elegido un modelo de dominio sencillo y cohesivo basado en los actores del sistema y los conceptos clave del servicio:
+## Decisiones y supuestos iniciales
 
-- Paciente
-- Médico
-- Personal administrativo
-- Administrador del sistema
-- Tipo de prueba
-- Solicitud de prueba
-- Cita
-- Informe médico
+### D-01 — Trazabilidad de requisitos y casos de uso
 
-Esto permite mantener el modelo comprensible, compatible con pruebas unitarias y fácilmente ampliable a una arquitectura multicapa.
+- **Decisión inicial:** utilizar como referencia de planificación el mapeo 1:1 entre cada requisito funcional y un caso de uso, y entre cada caso de uso y una iteración.
+- **Motivo:** es la simplificación recomendada por el enunciado para estimar inicialmente el proyecto.
+- **Consecuencia:** el catálogo de casos de uso debe conservar enlaces a los requisitos de origen y a la iteración/release que los realiza.
+- **Revisión:** el equipo debe comprobar que esta simplificación no agrupe artificialmente funcionalidades que deban tratarse juntas ni fragmente flujos coherentes.
 
-### 2. Arquitectura sugerida
+### D-02 — Fases e iteraciones de planificación
 
-Se propone una arquitectura mínima basada en capas:
+- **Decisión inicial:** contemplar una Iteración 0 de inicio, iteraciones de realización asociadas a casos de uso y una Iteración N de transición, integración, pruebas de integración, despliegue y cierre.
+- **Supuestos del enunciado:** para estimaciones iniciales, Iteración 0 cuesta 1.000 € y la Iteración N cuesta 2.000 € en recursos humanos. Una semana de consultoría humana equivale a 40 horas.
+- **Pendiente del equipo:** estimar el coste y duración de las iteraciones de realización, explicitar calendario de releases, capacidad del equipo, revisión humana de entregables de IA y costes de licencias/modelos. Las estimaciones deben reflejar incertidumbre y el posible sesgo de optimismo.
 
-- Capa de dominio: entidades y tipos de valor
-- Capa de servicio: lógica de negocio y coordinación
-- Capa de infraestructura: persistencia, integración externa y adaptadores (futuro)
-- Capa de presentación: UI web o cliente (futuro)
+### D-03 — Arquitectura por componentes y contratos
 
-### 3. Gestión de casos de uso
+- **Decisión inicial:** organizar el sistema en componentes cohesivos con bajo acoplamiento, que se comuniquen mediante interfaces explícitas. El diseño debe separar responsabilidades de presentación, aplicación/servicios, dominio e infraestructura.
+- **Motivo:** permite desarrollar e integrar incrementos de manera controlada, manteniendo contratos comprensibles entre módulos.
+- **Dirección tecnológica:** Java y Maven son la opción de referencia recomendada por el enunciado. Cada componente planificado debe tener responsabilidades, versión Semantic Versioning, interfaces y criterios de aceptación documentados.
+- **Estado actual:** el código inicial de este repositorio es un único módulo Maven; todavía no demuestra una arquitectura multimódulo ni contratos entre componentes. La descomposición deberá decidirse y aplicarse en las iteraciones correspondientes, evitando crear módulos sin un caso de uso y una responsabilidad justificados.
 
-Dado que el enunciado recomienda un mapeo 1:1 entre requisitos funcionales y casos de uso, la solución se organiza en torno a casos de uso concretos:
+### D-04 — Integraciones hospitalarias
 
-- Registro y gestión de pacientes
-- Solicitud de prueba diagnóstica
-- Programación de citas
-- Confirmación/cancelación de citas
-- Atención del paciente y seguimiento
-- Emisión de informes médicos
-- Generación de estadísticas y reportes
+- **Decisión inicial:** mantener las integraciones con SSO, Historia Clínica Electrónica, admisión y RIS/PACS como límites de integración explícitos, con adaptadores detrás de contratos propios cuando se planifiquen esos casos de uso.
+- **Estándares a considerar:** DICOM para imágenes y los estándares HL7/FHIR para intercambio clínico, según las necesidades acordadas.
+- **Alcance inicial:** no se presupone acceso a sistemas reales, credenciales, endpoints ni datos clínicos de producción. No se afirma que exista una integración funcional hasta que se diseñe, implemente y verifique.
 
-### 4. Manejo de prioridades
+### D-05 — Roles y permisos
 
-Se ha incorporado un orden explícito de prioridad para que el sistema pueda gestionar citas urgentes, preferentes y ordinarias de forma determinista.
+- **Actores identificados:** pacientes, médicos, personal administrativo/admisión y administradores del sistema.
+- **Decisión inicial:** vincular permisos a responsabilidades y limitar el acceso a información clínica al mínimo necesario para cada tarea.
+- **Pendiente del equipo:** especificar una matriz de permisos y los flujos de auditoría antes de implementar autorización. La autenticación corporativa/SSO se considera una integración, no una capacidad ya resuelta por el modelo de dominio.
 
-### 5. Seguimiento periódico
+### D-06 — Catálogo de pruebas y prioridades
 
-Los tipos de prueba con seguimiento periódico generan solicitudes de seguimiento de forma automática, en línea con el requisito de control y citación periódica para pruebas de cribado y revisiones.
+- **Decisión inicial:** el catálogo de tipos de prueba debe poder representar modalidad, equipo/sala, duración estimada, preparación, contraste, consentimiento informado, seguridad, prioridad y posibilidad de seguimiento periódico.
+- **Prioridad clínica:** conservar los niveles urgente, preferente y ordinario como valores explícitos; las reglas de ordenación y asignación de huecos deben definirse con el personal responsable.
+- **Alcance inicial:** los tipos de prueba presentes en el código son datos de ejemplo, no un catálogo clínico completo ni protocolos aprobados.
 
-### 6. Integración futura
+### D-07 — Seguimiento y citas
 
-Se mantienen interfaces que pueden adaptarse a SSO, HCE, sistemas de admisión y estándares RIS/PACS (DICOM, HL7 y FHIR) sin comprometer el modelo de dominio base.
+- **Requisito:** una prescripción de seguimiento puede especificar periodicidad y dar lugar a nuevas necesidades de cita.
+- **Decisión inicial:** distinguir la prescripción/plan de seguimiento de las citas concretas que gestione admisión. Generar citas automáticamente solo después de definir reglas, responsables, límites y aceptación del flujo.
+- **Estado actual:** el código inicial almacena una indicación de seguimiento en una solicitud, pero aún no programa automáticamente solicitudes ni citas futuras.
 
-## Suposiciones razonadas
+### D-08 — Calidad y pruebas
 
-- La solución inicial no implementa la integración real con sistemas externos; se modela una capa de adaptación que puede ampliarse más adelante.
-- La autenticación y autorización se asumen como requisitos de infraestructura y no forman parte de la lógica de dominio base.
-- La configuración del catálogo de pruebas se gestiona de modo programático para facilitar pruebas y cambios de negocio.
-- Las entidades se diseñan con identificación única para permitir trazabilidad y validación.
+- **Prioridades iniciales:** corrección funcional, seguridad y confidencialidad, mantenibilidad, interoperabilidad, usabilidad y testabilidad.
+- **Decisión inicial:** derivar criterios de aceptación y pruebas de los casos de uso. Cada componente debe contar con pruebas adecuadas a sus contratos; la integración y el sistema completo se verificarán en las iteraciones previstas para ello.
+- **Pendiente del equipo:** definir métricas y umbrales verificables de calidad, estrategia de pruebas y tratamiento de datos de prueba. No utilizar datos personales o clínicos reales en pruebas sin autorización y controles apropiados.
 
-## Métricas de calidad
+### D-09 — Gestión del trabajo y configuración
 
-Se priorizan propiedades como:
+- **Decisión inicial:** mantener trazabilidad entre planificación, reuniones, decisiones, issues, entregas y cambios del repositorio. Utilizar ramas y pull requests para revisar e integrar trabajo; evitar commits directos a `main`, conforme al enunciado.
+- **Versionado:** usar Semantic Versioning para componentes y construcciones, con ramas y releases coherentes con el plan de configuración que acuerde el equipo.
+- **Documentación:** enlazar desde la wiki del repositorio la planificación, casos de uso, actas, decisiones y demás entregables requeridos.
 
-- Correción funcional
-- Facilidad de mantenimiento
-- Claridad del diseño
-- Testabilidad
-- Bajo acoplamiento entre componentes
+## Límites de la línea base
 
-## Conclusión
-
-La solución actual es una base sólida para un desarrollo iterativo e incremental, siguiendo la recomendación del enunciado: definir primero el núcleo del dominio, después la lógica de servicio y, finalmente, ampliar con capas de infraestructura y presentación.
+Las decisiones anteriores son una propuesta inicial para revisión del equipo. No constituyen aprobación de requisitos clínicos ni sustituyen las decisiones humanas que se deben justificar en la memoria. Las funcionalidades existentes en el código deben evaluarse frente a los casos de uso y sus contratos antes de considerarse completas.
