@@ -6,7 +6,7 @@
         <artifactId>radiodiagnostico</artifactId>
         <version>0.1.0-SNAPSHOT</version>
     </parent>
-    <artifactId>servidor</artifactId>
+    <artifactId>cliente</artifactId>
     <version>1.0.0-SNAPSHOT</version>
     <dependencies>
         <dependency>
