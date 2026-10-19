@@ -1,0 +1,18 @@
+<!-- servidor/pom.xml -->
+<project>
+ <modelVersion>4.0.0</modelVersion>
+ <parent>
+ <groupId>es.uclm.esi.iso2</groupId>
+ <artifactId>radiodiagnostico</artifactId>
+ <version>0.1.0-SNAPSHOT</version>
+ </parent>
+ <artifactId>servidor</artifactId>
+ <version>1.0.0-SNAPSHOT</version>
+ <dependencies>
+ <dependency>
+ <groupId>org.junit.jupiter</groupId>
+ <artifactId>junit-jupiter</artifactId>
+ <scope>test</scope>
+ </dependency>
+ </dependencies>
+</project>
